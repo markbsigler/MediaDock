@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+    beets:
+        container_name: beets
+        ports:
+            - '8337:8337'
+        volumes:
+            - 'beets_data:/config'
+            - '/srv/share/media/music:/music'
+            - '/srv/share/downloads:/downloads'
+            - '/etc/localtime:/etc/localtime:ro'
+        environment:
+            - TZ=America/New_York
+            - PGID=1000
+            - PUID=1000
+            - UMASK_SET=002
+        restart: unless-stopped
+        network_mode: bridge_all
+        image: linuxserver/beets
