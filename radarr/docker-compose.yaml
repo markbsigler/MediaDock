@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+    radarr:
+        container_name: radarr
+        ports:
+            - '7878:7878'
+        volumes:
+            - 'radarr_data:/config'
+            - '/srv/share/media/videos/movies:/movies'
+            - '/srv/share/downloads:/downloads'
+            - '/etc/localtime:/etc/localtime:ro'
+        environment:
+            - TZ=America/New_York
+            - PGID=1000
+            - PUID=1000
+            - UMASK_SET=002
+        restart: unless-stopped
+        network_mode: bridge_media
+        image: linuxserver/radarr

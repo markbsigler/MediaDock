@@ -1,0 +1,25 @@
+docker run -d \
+	--cap-add=NET_ADMIN \
+	-p 8080:8080 \
+	-p 8090:8090 \
+	-p 8118:8118 \
+	--name=sabnzbdvpn \
+	-v /root/docker/data:/data \
+	-v /root/docker/config:/config \
+	-v /etc/localtime:/etc/localtime:ro \
+	-e VPN_ENABLED=yes \
+	-e VPN_USER=myusername \
+	-e VPN_PASS=mypassword \
+	-e VPN_PROV=pia \
+	-e VPN_CLIENT=openvpn \
+	-e STRICT_PORT_FORWARD=no \
+	-e ENABLE_PRIVOXY=yes \
+	-e LAN_NETWORK=192.168.1.0/24 \
+	-e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
+	-e VPN_INPUT_PORTS=1234 \
+	-e VPN_OUTPUT_PORTS=5678 \
+	-e DEBUG=false \
+	-e UMASK=000 \
+	-e PUID=0 \
+	-e PGID=0 \
+	binhex/arch-sabnzbdvpn
