@@ -16,7 +16,7 @@ services:
             - VPN_PROV=pia
             - VPN_CLIENT=openvpn
             - VPN_INPUT_PORTS=1234
-            - VPN_OUTPUT_PORTS=5678
+            - VPN_OUTPUT_PORTS=5000-5100
             - STRICT_PORT_FORWARD=yes
             - ENABLE_PRIVOXY=yes
             - LAN_NETWORK=10.0.0.0/24
@@ -71,7 +71,7 @@ services:
             - LAN_NETWORK=10.0.0.0/24
             - 'NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1'
             - VPN_INPUT_PORTS=2234
-            - VPN_OUTPUT_PORTS=6678
+            - VPN_OUTPUT_PORTS=6000-6100
             - DEBUG=false
         network_mode: bridge_media
         deploy:
