@@ -1,232 +1,368 @@
+version: '3.8'
+
+networks:
+  bridge_media:
+    driver: bridge
+
 services:
-    delugevpn:
-        image: binhex/arch-delugevpn
-        container_name: delugevpn
-        hostname: delugevpn
-        cap_add:
-            - NET_ADMIN
-        environment:
-            - TZ=America/New_York
-            - PGID=0
-            - PUID=0
-            - UMASK=000
-            - VPN_ENABLED=yes
-            - VPN_USER=REMOVED_UID
-            - VPN_PASS=REMOVED_PWD
-            - VPN_PROV=pia
-            - VPN_CLIENT=openvpn
-            - VPN_INPUT_PORTS=1234
-            - VPN_OUTPUT_PORTS=5678
-            - STRICT_PORT_FORWARD=yes
-            - ENABLE_PRIVOXY=yes
-            - LAN_NETWORK=10.0.0.0/24
-            - 'NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1'
-            - DELUGE_DAEMON_LOG_LEVEL=info
-            - DELUGE_WEB_LOG_LEVEL=info
-            - DELUGE_ENABLE_WEBUI_PASSWORD=yes  
-            - DEBUG=false
-        volumes:
-            - '/srv/share/container/delugevpn/config:/config'
-            - '/srv/share/downloads:/data'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '8112:8112'
-            - '8118:8118'
-            - '58846:58846'
-            - '58946:58946'
-        network_mode: bridge_media
-          #        depends_on:
-          #            - nzbgetvpn  # Ensure nzbgetvpn starts first
-        deploy:
-          restart_policy:
-            delay: 30s
-        restart: unless-stopped 
-#    nzbgetvpn:
-#        image: jshridha/docker-nzbgetvpn:latest
-#        container_name: nzbgetvpn
-#        hostname: nzbgetvpn
-#        cap_add:
-#            - NET_ADMIN
-#        ports:
-#            - 8212:6789
-#            - 8218:8118
-#            - 59846:58846
-#            - 59946:58946
-#        volumes:
-#            - /srv/share/container/nzbgetvpn/config:/config
-#            - /srv/share/downloads:/data
-#            - /etc/localtime:/etc/localtime:ro
-#        environment:
-#            - TZ=America/New_York
-#            - PGID=1000
-#            - PUID=1000
-#            - UMASK=002
-#            - VPN_ENABLED=yes
-#            - VPN_USER=REMOVED_UID
-#            - VPN_PASS=REMOVED_PWD
-#            - VPN_PROV=pia
-#            - VPN_CLIENT=openvpn
-#            - STRICT_PORT_FORWARD=yes
-#            - ENABLE_PRIVOXY=yes
-#            - LAN_NETWORK=10.0.0.0/24
-#            - 'NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1'
-#            - VPN_INPUT_PORTS=2234
-#            - VPN_OUTPUT_PORTS=6678
-#            - DEBUG=false
-#        network_mode: bridge_media
-#        deploy:
-#          restart_policy:
-#            delay: 30s
-#        restart: unless-stopped
-    prowlarr:
-        hostname: prowlarr
-        container_name: prowlarr
-        image: lscr.io/linuxserver/prowlarr:latest
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - UMASK=002
-            - TZ=America/New_York
-        volumes:
-            - '/srv/share/container/prowlarr/config:/config'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - 9696:9696
-        network_mode: bridge_media
-        depends_on:
-            - delugevpn  # Ensure starts first
-        restart: unless-stopped
-    radarr:
-        hostname: radarr
-        container_name: radarr
-        image: lscr.io/linuxserver/radarr:latest
-        environment:
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-            - TZ=America/New_York
-        volumes:
-            - '/srv/share/container/radarr/config:/config'
-            - '/srv/share/media/videos/movies:/movies'
-            - '/srv/share/downloads:/downloads'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '7878:7878'
-        network_mode: bridge_media
-        depends_on:
-            - prowlarr # Ensure starts first
-        restart: unless-stopped
-    sonarr:
-        hostname: sonarr
-        container_name: sonarr
-        image: lscr.io/linuxserver/sonarr:latest
-        environment:
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-            - TZ=America/New_York
-        volumes:
-            - '/srv/share/container/sonarr/config:/config'
-            - '/srv/share/media/videos/tv:/tv'
-            - '/srv/share/downloads:/downloads'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '8989:8989'
-        network_mode: bridge_media
-        depends_on:
-            - prowlarr # Ensure starts first
-        restart: unless-stopped
-    lidarr:
-        hostname: lidarr
-        container_name: lidarr
-          #        image: lscr.io/linuxserver/lidarr:latest
-        image: lscr.io/linuxserver/lidarr:develop
-        environment:
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-            - TZ=America/New_York
-        volumes:
-            - '/srv/share/container/lidarr/config:/config'
-            - '/srv/share/media/music:/music'
-            - '/srv/share/downloads:/downloads'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '8686:8686'
-        network_mode: bridge_media
-        depends_on:
-            - prowlarr # Ensure starts first
-        restart: unless-stopped
-    ombi:
-        hostname: ombi
-        container_name: ombi
-        image: lscr.io/linuxserver/ombi
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-        volumes:
-            - '/srv/share/container/ombi/config:/config'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '3579:3579'
-        network_mode: bridge_media
-        depends_on:
-            - prowlarr # Ensure starts first
-        restart: unless-stopped
-    bazarr:
-        hostname: bazarr
-        container_name: bazarr
-        image: lscr.io/linuxserver/bazarr
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-        volumes:
-            - '/srv/share/container/bazarr/config:/config'
-            - '/srv/share/media/videos/movies:/movies'
-            - '/srv/share/media/videos/tv:/tv'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '6767:6767/tcp'
-        network_mode: bridge_media
-        depends_on:
-            - prowlarr # Ensure starts first
-        restart: unless-stopped
-#    tautulli:
-#        hostname: tautulli
-#        container_name: tautulli
-#        image: lscr.io/linuxserver/tautulli
-#        environment:
-#            - TZ=America/New_York
-#            - PGID=1000
-#            - PUID=1000
-#            - UMASK=002
-#        volumes:
-#            - '/srv/share/container/tautulli/config:/config'
-#            - '/etc/localtime:/etc/localtime:ro'
-#        ports:
-#            - '8181:8181'
-#        network_mode: bridge_media
-#        depends_on:
-#            - prowlarr # Ensure starts first
-#        restart: unless-stopped
-    flaresolverr:
-        hostname: flaresolverr
-        container_name: flaresolverr
-        image: ghcr.io/flaresolverr/flaresolverr:latest
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-            - LOG_LEVEL=${LOG_LEVEL:-info}
-            - LOG_HTML=${LOG_HTML:-false}
-            - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-        ports:
-            - "${PORT:-8191}:8191"
-        network_mode: bridge_media
-        depends_on:
-            - prowlarr # Ensure starts first
-        restart: unless-stopped
+  # NZBGet with VPN - Downloads Usenet content through VPN
+  nzbgetvpn:
+    image: jshridha/docker-nzbgetvpn:latest
+    container_name: nzbgetvpn
+    hostname: nzbgetvpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8212:6789
+      - 8218:8118
+      - 59846:58846
+      - 59946:58946
+    volumes:
+      - /srv/share/container/nzbgetvpn/config:/config
+      - /srv/share/downloads:/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+      - VPN_ENABLED=yes
+      - VPN_USER=${VPN_USERNAME}
+      - VPN_PASS=${VPN_PASSWORD}
+      - VPN_PROV=pia
+      - VPN_CLIENT=openvpn
+      - STRICT_PORT_FORWARD=yes
+      - ENABLE_PRIVOXY=yes
+      - LAN_NETWORK=10.0.0.0/24
+      - NAME_SERVERS=1.1.1.1,1.0.0.1,8.8.8.8,8.8.4.4
+      - VPN_INPUT_PORTS=2234
+      - VPN_OUTPUT_PORTS=6000-6100
+      - DEBUG=false
+    networks:
+      - bridge_media
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6789 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Deluge with VPN - Torrent client through VPN
+  delugevpn:
+    image: binhex/arch-delugevpn
+    container_name: delugevpn
+    hostname: delugevpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+      - VPN_ENABLED=yes
+      - VPN_USER=${VPN_USERNAME}
+      - VPN_PASS=${VPN_PASSWORD}
+      - VPN_PROV=pia
+      - VPN_CLIENT=openvpn
+      - VPN_INPUT_PORTS=1234
+      - VPN_OUTPUT_PORTS=5000-5100
+      - STRICT_PORT_FORWARD=yes
+      - ENABLE_PRIVOXY=yes
+      - LAN_NETWORK=10.0.0.0/24
+      - NAME_SERVERS=1.1.1.1,1.0.0.1,8.8.8.8,8.8.4.4
+      - DELUGE_DAEMON_LOG_LEVEL=info
+      - DELUGE_WEB_LOG_LEVEL=info
+      - DELUGE_ENABLE_WEBUI_PASSWORD=yes  
+      - DEBUG=false
+    volumes:
+      - /srv/share/container/delugevpn/config:/config
+      - /srv/share/downloads:/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8112:8112
+      - 8118:8118
+      - 58846:58846
+      - 58946:58946
+    networks:
+      - bridge_media
+    depends_on:
+      - nzbgetvpn
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8112 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # FlareSolverr - Cloudflare bypass for Prowlarr
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    hostname: flaresolverr
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+    ports:
+      - "${PORT:-8191}:8191"
+    networks:
+      - bridge_media
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Prowlarr - Indexer manager for *arr apps
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    hostname: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/New_York
+    volumes:
+      - /srv/share/container/prowlarr/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9696:9696
+    networks:
+      - bridge_media
+    depends_on:
+      - flaresolverr
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9696/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Radarr - Movie management and automation
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    hostname: radarr
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+      - TZ=America/New_York
+    volumes:
+      - /srv/share/container/radarr/config:/config
+      - /srv/share/media/videos/movies:/movies
+      - /srv/share/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 7878:7878
+    networks:
+      - bridge_media
+    depends_on:
+      - prowlarr
+      - delugevpn
+      - nzbgetvpn
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7878/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Sonarr - TV show management and automation
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    hostname: sonarr
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+      - TZ=America/New_York
+    volumes:
+      - /srv/share/container/sonarr/config:/config
+      - /srv/share/media/videos/tv:/tv
+      - /srv/share/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8989:8989
+    networks:
+      - bridge_media
+    depends_on:
+      - prowlarr
+      - delugevpn
+      - nzbgetvpn
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8989/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Lidarr - Music management and automation
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    hostname: lidarr
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+      - TZ=America/New_York
+    volumes:
+      - /srv/share/container/lidarr/config:/config
+      - /srv/share/media/music:/music
+      - /srv/share/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8686:8686
+    networks:
+      - bridge_media
+    depends_on:
+      - prowlarr
+      - delugevpn
+      - nzbgetvpn
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8686/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Bazarr - Subtitle management for Radarr and Sonarr
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    hostname: bazarr
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+    volumes:
+      - /srv/share/container/bazarr/config:/config
+      - /srv/share/media/videos/movies:/movies
+      - /srv/share/media/videos/tv:/tv
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 6767:6767
+    networks:
+      - bridge_media
+    depends_on:
+      - radarr
+      - sonarr
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6767 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Ombi - Media request and user management
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    hostname: ombi
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+    volumes:
+      - /srv/share/container/ombi/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3579:3579
+    networks:
+      - bridge_media
+    depends_on:
+      - radarr
+      - sonarr
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3579 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Tautulli - Plex statistics and monitoring
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    hostname: tautulli
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+      - UMASK=002
+    volumes:
+      - /srv/share/container/tautulli/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8181:8181
+    networks:
+      - bridge_media
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8181 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
