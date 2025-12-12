@@ -35,49 +35,49 @@ services:
             - '58846:58846'
             - '58946:58946'
         network_mode: bridge_media
-        depends_on:
-            - nzbgetvpn  # Ensure nzbgetvpn starts first
+          #        depends_on:
+          #            - nzbgetvpn  # Ensure nzbgetvpn starts first
         deploy:
           restart_policy:
             delay: 30s
         restart: unless-stopped 
-    nzbgetvpn:
-        image: jshridha/docker-nzbgetvpn:latest
-        container_name: nzbgetvpn
-        hostname: nzbgetvpn
-        cap_add:
-            - NET_ADMIN
-        ports:
-            - 8212:6789
-            - 8218:8118
-            - 59846:58846
-            - 59946:58946
-        volumes:
-            - /srv/share/container/nzbgetvpn/config:/config
-            - /srv/share/downloads:/data
-            - /etc/localtime:/etc/localtime:ro
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-            - VPN_ENABLED=yes
-            - VPN_USER=REMOVED_UID
-            - VPN_PASS=REMOVED_PWD
-            - VPN_PROV=pia
-            - VPN_CLIENT=openvpn
-            - STRICT_PORT_FORWARD=yes
-            - ENABLE_PRIVOXY=yes
-            - LAN_NETWORK=10.0.0.0/24
-            - 'NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1'
-            - VPN_INPUT_PORTS=2234
-            - VPN_OUTPUT_PORTS=6678
-            - DEBUG=false
-        network_mode: bridge_media
-        deploy:
-          restart_policy:
-            delay: 30s
-        restart: unless-stopped
+#    nzbgetvpn:
+#        image: jshridha/docker-nzbgetvpn:latest
+#        container_name: nzbgetvpn
+#        hostname: nzbgetvpn
+#        cap_add:
+#            - NET_ADMIN
+#        ports:
+#            - 8212:6789
+#            - 8218:8118
+#            - 59846:58846
+#            - 59946:58946
+#        volumes:
+#            - /srv/share/container/nzbgetvpn/config:/config
+#            - /srv/share/downloads:/data
+#            - /etc/localtime:/etc/localtime:ro
+#        environment:
+#            - TZ=America/New_York
+#            - PGID=1000
+#            - PUID=1000
+#            - UMASK=002
+#            - VPN_ENABLED=yes
+#            - VPN_USER=REMOVED_UID
+#            - VPN_PASS=REMOVED_PWD
+#            - VPN_PROV=pia
+#            - VPN_CLIENT=openvpn
+#            - STRICT_PORT_FORWARD=yes
+#            - ENABLE_PRIVOXY=yes
+#            - LAN_NETWORK=10.0.0.0/24
+#            - 'NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1'
+#            - VPN_INPUT_PORTS=2234
+#            - VPN_OUTPUT_PORTS=6678
+#            - DEBUG=false
+#        network_mode: bridge_media
+#        deploy:
+#          restart_policy:
+#            delay: 30s
+#        restart: unless-stopped
     prowlarr:
         hostname: prowlarr
         container_name: prowlarr
@@ -93,6 +93,8 @@ services:
         ports:
             - 9696:9696
         network_mode: bridge_media
+        depends_on:
+            - delugevpn  # Ensure starts first
         restart: unless-stopped
     radarr:
         hostname: radarr
@@ -111,6 +113,8 @@ services:
         ports:
             - '7878:7878'
         network_mode: bridge_media
+        depends_on:
+            - prowlarr # Ensure starts first
         restart: unless-stopped
     sonarr:
         hostname: sonarr
@@ -129,11 +133,14 @@ services:
         ports:
             - '8989:8989'
         network_mode: bridge_media
+        depends_on:
+            - prowlarr # Ensure starts first
         restart: unless-stopped
     lidarr:
         hostname: lidarr
         container_name: lidarr
-        image: lscr.io/linuxserver/lidarr:latest
+          #        image: lscr.io/linuxserver/lidarr:latest
+        image: lscr.io/linuxserver/lidarr:develop
         environment:
             - PGID=1000
             - PUID=1000
@@ -147,6 +154,8 @@ services:
         ports:
             - '8686:8686'
         network_mode: bridge_media
+        depends_on:
+            - prowlarr # Ensure starts first
         restart: unless-stopped
     ombi:
         hostname: ombi
@@ -163,6 +172,8 @@ services:
         ports:
             - '3579:3579'
         network_mode: bridge_media
+        depends_on:
+            - prowlarr # Ensure starts first
         restart: unless-stopped
     bazarr:
         hostname: bazarr
@@ -181,23 +192,27 @@ services:
         ports:
             - '6767:6767/tcp'
         network_mode: bridge_media
+        depends_on:
+            - prowlarr # Ensure starts first
         restart: unless-stopped
-    tautulli:
-        hostname: tautulli
-        container_name: tautulli
-        image: lscr.io/linuxserver/tautulli
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-            - UMASK=002
-        volumes:
-            - '/srv/share/container/tautulli/config:/config'
-            - '/etc/localtime:/etc/localtime:ro'
-        ports:
-            - '8181:8181'
-        network_mode: bridge_media
-        restart: unless-stopped
+#    tautulli:
+#        hostname: tautulli
+#        container_name: tautulli
+#        image: lscr.io/linuxserver/tautulli
+#        environment:
+#            - TZ=America/New_York
+#            - PGID=1000
+#            - PUID=1000
+#            - UMASK=002
+#        volumes:
+#            - '/srv/share/container/tautulli/config:/config'
+#            - '/etc/localtime:/etc/localtime:ro'
+#        ports:
+#            - '8181:8181'
+#        network_mode: bridge_media
+#        depends_on:
+#            - prowlarr # Ensure starts first
+#        restart: unless-stopped
     flaresolverr:
         hostname: flaresolverr
         container_name: flaresolverr
@@ -212,4 +227,6 @@ services:
         ports:
             - "${PORT:-8191}:8191"
         network_mode: bridge_media
+        depends_on:
+            - prowlarr # Ensure starts first
         restart: unless-stopped
