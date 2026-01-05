@@ -86,8 +86,6 @@ services:
     environment:
       <<: *common-env-vars
       VPN_ENABLED: "yes"
-      VPN_USER: "REMOVED_UID"
-      VPN_PASS: "REMOVED_PWD"
       VPN_PROV: pia
       VPN_CLIENT: wireguard
       STRICT_PORT_FORWARD: "yes"
@@ -122,6 +120,12 @@ services:
       - vpn_username
       - vpn_password
     restart: *restart-policy
+    command: >
+      sh -c '
+        export VPN_USER=$(cat /run/secrets/vpn_username)
+        export VPN_PASS=$(cat /run/secrets/vpn_password)
+        exec /bin/bash init.sh
+      '
 
   # FlareSolverr - Cloudflare bypass for Prowlarr
   flaresolverr:
