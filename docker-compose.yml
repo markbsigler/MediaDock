@@ -29,7 +29,7 @@ services:
     environment:
       <<: *common-env-vars
     ports:
-      - '6767:6767'
+      - '127.0.0.1:6767:6767'
     networks:
       - bridge_media
     restart: *restart-policy
@@ -67,10 +67,10 @@ services:
       DELUGE_ENABLE_WEBUI_PASSWORD: "yes"
       DEBUG: "false"
     ports:
-      - '8112:8112'
-      - '8118:8118'
-      - '58846:58846'
-      - '58946:58946'
+      - '127.0.0.1:8112:8112'
+      - '127.0.0.1:8118:8118'
+      - '127.0.0.1:58846:58846'
+      - '127.0.0.1:58946:58946'
     networks:
       - bridge_media
         #    depends_on:
@@ -108,7 +108,7 @@ services:
       LOG_HTML: ${LOG_HTML:-false}
       CAPTCHA_SOLVER: ${CAPTCHA_SOLVER:-none}
     ports:
-      - '${PORT:-8191}:8191'
+      - '127.0.0.1:${PORT:-8191}:8191'
     networks:
       - bridge_media
     restart: *restart-policy
@@ -138,7 +138,7 @@ services:
     environment:
       <<: *common-env-vars
     ports:
-      - '8686:8686'
+      - '127.0.0.1:8686:8686'
     networks:
       - bridge_media
     restart: *restart-policy
@@ -165,7 +165,7 @@ services:
     environment:
       <<: *common-env-vars
     ports:
-      - '9696:9696'
+      - '127.0.0.1:9696:9696'
     networks:
       - bridge_media
     restart: *restart-policy
@@ -195,7 +195,7 @@ services:
     environment:
       <<: *common-env-vars
     ports:
-      - '7878:7878'
+      - '127.0.0.1:7878:7878'
     networks:
       - bridge_media
     restart: *restart-policy
@@ -225,7 +225,7 @@ services:
     environment:
       <<: *common-env-vars
     ports:
-      - '8989:8989'
+      - '127.0.0.1:8989:8989'
     networks:
       - bridge_media
     restart: *restart-policy
