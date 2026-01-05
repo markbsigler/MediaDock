@@ -28,3 +28,6 @@ Thumbs.db
 # Backup files
 *.bak
 *.backup
+vpn_username.txt
+vpn_password.txt
+docker_volumes_backup
