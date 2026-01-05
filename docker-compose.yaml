@@ -45,10 +45,10 @@ services:
 #      - PUID=1000
 #      - UMASK=002
 #      - VPN_ENABLED=yes
-#      - VPN_USER=${VPN_USERNAME}
-#      - VPN_PASS=${VPN_PASSWORD}
+#      - VPN_USER: "REMOVED_UID"
+#      - VPN_PASS: "REMOVED_PWD"
 #      - VPN_PROV=pia
-#      - VPN_CLIENT=openvpn
+#      - VPN_CLIENT: wireguard
 #      - STRICT_PORT_FORWARD=yes
 #      - ENABLE_PRIVOXY=yes
 #      - LAN_NETWORK=10.0.0.0/24
@@ -80,15 +80,16 @@ services:
     mem_reservation: 512m
     cap_add:
       - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    privileged: true
     environment:
       <<: *common-env-vars
       VPN_ENABLED: "yes"
-      VPN_USER_FILE: /run/secrets/vpn_username
-      VPN_PASS_FILE: /run/secrets/vpn_password
+      VPN_USER: "REMOVED_UID"
+      VPN_PASS: "REMOVED_PWD"
       VPN_PROV: pia
-      VPN_CLIENT: openvpn
-#      - VPN_INPUT_PORTS=1234
-#      - VPN_OUTPUT_PORTS=5000:5100
+      VPN_CLIENT: wireguard
       STRICT_PORT_FORWARD: "yes"
       ENABLE_PRIVOXY: "yes"
       LAN_NETWORK: 10.0.0.0/24
